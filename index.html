@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <title>สไลด์การประชุม</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Thai", sans-serif;
+      background: #fff;
+      color: #111;
+    }
+    .container {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 16px 14px 28px;
+    }
+    .title {
+      text-align: center;
+      font-size: clamp(1.35rem, 4vw, 1.65rem);
+      font-weight: 800;
+      margin: 2px 0 2px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: .95rem;
+      margin-bottom: 14px;
+    }
+    .slider-wrap { margin: 6px 0 12px; }
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: .95rem;
+      margin-bottom: 6px;
+    }
+    input[type="range"] { width: 100%; }
+    .nav {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    button {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid #d7d7d7;
+      border-radius: 12px;
+      background: #fff;
+      font-size: 1rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    button:hover:not(:disabled) { background: #f6f6f6; }
+    button:disabled { opacity: .4; cursor: not-allowed; }
+    .slide-number {
+      text-align: center;
+      font-size: 1.08rem;
+      font-weight: 800;
+      padding: 8px 4px;
+    }
+    .slide-frame {
+      width: 100%;
+      min-height: 180px;
+      display: grid;
+      place-items: center;
+      background: #fafafa;
+      border: 1px solid #ececec;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    #slideImage {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      background: #fff;
+    }
+    .caption {
+      text-align: center;
+      color: #666;
+      font-size: .9rem;
+      margin-top: 7px;
+    }
+    .error {
+      padding: 28px 18px;
+      text-align: center;
+      color: #a00000;
+    }
+    hr { border: 0; border-top: 1px solid #e8e8e8; margin: 22px 0 14px; }
+    .lower-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+    details {
+      margin-top: 18px;
+      border: 1px solid #e4e4e4;
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    summary { font-weight: 700; cursor: pointer; }
+    ol { padding-left: 24px; line-height: 1.7; }
+    @media (max-width: 600px) {
+      .container { padding-left: 10px; padding-right: 10px; }
+      .nav { grid-template-columns: 1fr 1.05fr 1fr; gap: 6px; }
+      button { min-height: 46px; font-size: .92rem; padding: 6px; }
+      .slide-number { font-size: .95rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="title">📱 สไลด์การประชุม</div>
+    <div class="subtitle">เลื่อนหมายเลขให้ตรงกับหน้าที่กำลังอภิปราย</div>
+
+    <section class="slider-wrap">
+      <div class="slider-label">
+        <span>เลือกหมายเลขสไลด์</span>
+        <strong id="sliderValue">1</strong>
+      </div>
+      <input id="slideSlider" type="range" min="1" max="8" value="1" step="1" />
+    </section>
+
+    <section class="nav">
+      <button id="prevBtn">◀ ก่อนหน้า</button>
+      <div id="slideNumber" class="slide-number">หน้า 1 / 8</div>
+      <button id="nextBtn">ถัดไป ▶</button>
+    </section>
+
+    <section class="slide-frame">
+      <img id="slideImage" src="slides/slide01.png" alt="สไลด์ที่ 1" />
+      <div id="imageError" class="error" hidden></div>
+    </section>
+    <div id="caption" class="caption">สไลด์ที่ 1</div>
+
+    <hr />
+
+    <section class="lower-nav">
+      <button id="lowerPrev">◀ หน้าก่อน</button>
+      <button id="homeBtn">หน้าแรก</button>
+      <button id="lowerNext">หน้าถัดไป ▶</button>
+    </section>
+
+    <details>
+      <summary>วิธีใช้งาน</summary>
+      <ol>
+        <li>สแกน QR code เพื่อเปิดหน้าเว็บนี้</li>
+        <li>ฟังหมายเลขสไลด์จากผู้นำเสนอ</li>
+        <li>เลื่อน Slider ไปยังหมายเลขเดียวกัน</li>
+        <li>สามารถกด <strong>ก่อนหน้า</strong> หรือ <strong>ถัดไป</strong> เพื่อทบทวนได้</li>
+        <li>ผู้เข้าประชุมแต่ละคนสามารถควบคุมหน้าสไลด์ของตนเอง</li>
+      </ol>
+    </details>
+  </main>
+
+  <script>
+    const TOTAL_SLIDES = 8;
+    let currentSlide = 1;
+
+    const slider = document.getElementById('slideSlider');
+    const sliderValue = document.getElementById('sliderValue');
+    const slideNumber = document.getElementById('slideNumber');
+    const image = document.getElementById('slideImage');
+    const imageError = document.getElementById('imageError');
+    const caption = document.getElementById('caption');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const lowerPrev = document.getElementById('lowerPrev');
+    const lowerNext = document.getElementById('lowerNext');
+    const homeBtn = document.getElementById('homeBtn');
+
+    function fileName(n) {
+      return `slides/slide${String(n).padStart(2, '0')}.png`;
+    }
+
+    function render() {
+      slider.value = currentSlide;
+      sliderValue.textContent = currentSlide;
+      slideNumber.textContent = `หน้า ${currentSlide} / ${TOTAL_SLIDES}`;
+      caption.textContent = `สไลด์ที่ ${currentSlide}`;
+
+      prevBtn.disabled = currentSlide <= 1;
+      lowerPrev.disabled = currentSlide <= 1;
+      nextBtn.disabled = currentSlide >= TOTAL_SLIDES;
+      lowerNext.disabled = currentSlide >= TOTAL_SLIDES;
+
+      imageError.hidden = true;
+      image.hidden = false;
+      image.alt = `สไลด์ที่ ${currentSlide}`;
+      image.src = fileName(currentSlide);
+
+      // เก็บหน้าล่าสุดไว้ในเครื่องของผู้ใช้
+      localStorage.setItem('meetingSlideNumber', String(currentSlide));
+    }
+
+    function goTo(n) {
+      currentSlide = Math.min(TOTAL_SLIDES, Math.max(1, Number(n)));
+      render();
+    }
+
+    slider.addEventListener('input', e => goTo(e.target.value));
+    prevBtn.addEventListener('click', () => goTo(currentSlide - 1));
+    nextBtn.addEventListener('click', () => goTo(currentSlide + 1));
+    lowerPrev.addEventListener('click', () => goTo(currentSlide - 1));
+    lowerNext.addEventListener('click', () => goTo(currentSlide + 1));
+    homeBtn.addEventListener('click', () => goTo(1));
+
+    image.addEventListener('error', () => {
+      image.hidden = true;
+      imageError.hidden = false;
+      imageError.innerHTML = `ไม่พบไฟล์ <strong>${fileName(currentSlide)}</strong><br>โปรดตรวจสอบชื่อไฟล์ในโฟลเดอร์ slides`;
+    });
+
+    // รองรับปุ่มลูกศรบนคีย์บอร์ด/รีโมตบางรุ่น
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft') goTo(currentSlide - 1);
+      if (e.key === 'ArrowRight') goTo(currentSlide + 1);
+      if (e.key === 'Home') goTo(1);
+    });
+
+    const saved = Number(localStorage.getItem('meetingSlideNumber'));
+    if (Number.isInteger(saved) && saved >= 1 && saved <= TOTAL_SLIDES) {
+      currentSlide = saved;
+    }
+    render();
+  </script>
+</body>
+</html>
